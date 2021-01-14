@@ -39,7 +39,14 @@ var userSchema = new mongoose.Schema({
 // https://mongoosejs.com/docs/models.html
 var userModel = mongoose.model("users", userSchema);
 
+var resetPassword = new mongoose.Schema({
+    "email": String,
+    "otp": String,
+    "createdOn": { "type": Date, "default": Date.now },
+});
+var otpModel = mongoose.model("otp", resetPassword);
 
 module.exports = {
     userModel: userModel,
+    otpModel: otpModel
 }

@@ -1,9 +1,11 @@
 var express = require('express')
 var bcrypt = require("bcrypt-inzi")
 var jwt = require('jsonwebtoken');
-var {userModel} = require('../dbconn/modules')
+var { userModel, otpModel } = require('../dbconn/modules')
 var router = express.Router();
 var SERVER_SECRET = process.env.SECRET || "1234";
+var postmark = require("postmark");
+var client = new postmark.ServerClient("c1085f89-3538-4e2d-8751-faf7125765e6");
 
 router.post("/signup", (req, res, next) => {
 
@@ -60,7 +62,7 @@ router.post("/signup", (req, res, next) => {
                 })
             } else {
                 res.send({
-                    message:"user already exist"
+                    message: "user already exist"
                 })
             }
         })
@@ -137,4 +139,57 @@ router.post("/logout", (req, res, next) => {
 
     res.send("logout success");
 })
+router.post('/forget-password', (req, res, next) => {
+    if (!req.body.email) {
+        res.status(403).send({
+            message: "please pprovide email"
+        })
+    }
+    userModel.findOne({email: req.body.email},(err,user)=>{
+        if(err){
+            res.status(500).send({
+                message : "Something went wrong"
+            })
+        }
+        else if(user){
+            const otp = Math.floor(generetOtp(111111,999999))
+            otpModel.create({
+                email: req.body.email,
+                otpCode: otp 
+            }).then((data)=>{
+                client.sendEmail({
+                    "From": "jahanzaib_student@sysborg.com",
+                    "To": req.body.email,
+                    "Subject": "Reset Your Password",
+                    "Textbody": `Here is your Reset password code : ${otp}`
+                },(err,status)=>{
+                    if(status){
+                        res.send({
+                            message: "Email send successfully"
+                        })
+                    }
+                    else{
+                        res.send({
+                            message: "An unexpected error occured"
+                        })
+                    }
+                })
+            })
+        }
+        else{
+            res.send({
+                message: "User not found"
+            })
+        }
+    })
+
+})
+
+router.post('/forget-password-2', (req,res,nexr)={
+    
+})
+
+function generetOtp(min, max) {
+    return Math.random() * (max - min) + min;
+}
 module.exports = router;

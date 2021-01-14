@@ -14,8 +14,7 @@ function signup() {
         if (response.data.status === 200) {
             alert(response.data.message)
             location.href = "./login.html"
-        }
-        else{
+        } else {
             alert(response.data.message);
         }
     }).catch((error) => {
@@ -23,6 +22,7 @@ function signup() {
     });
     return false
 }
+
 function login() {
     axios({
         method: 'post',
@@ -30,7 +30,8 @@ function login() {
         data: {
             email: document.getElementById('lemail').value,
             password: document.getElementById('lpassword').value,
-        }, withCredentials: true
+        },
+        withCredentials: true
     }).then((response) => {
         console.log(response);
         alert(response.data.message)
@@ -42,23 +43,23 @@ function login() {
 }
 
 function getProfile() {
-axios({
-    method: 'get',
-    url: 'http://localhost:5000/profile',
-    credentials: 'include',
-}).then((response) => {
-    console.log(response);
-    document.getElementById('pName').innerHTML = response.data.profile.name
-    document.getElementById('pEmail').innerHTML = response.data.profile.email
-    document.getElementById('pPhone').innerHTML = response.data.profile.phone
-    document.getElementById('pGender').innerHTML = response.data.profile.gender
-}, (error) => {
-    console.log(error.message);
-    location.href = "./login.html"
-});
-return false
+    axios({
+        method: 'get',
+        url: 'http://localhost:5000/profile',
+        credentials: 'include',
+    }).then((response) => {
+        console.log(response);
+        document.getElementById('pName').innerHTML = response.data.profile.name
+        document.getElementById('pPhone').innerHTML = response.data.profile.phone
+        document.getElementById('pEmail').innerHTML = response.data.profile.email
+    }, (error) => {
+        console.log(error.message);
+        location.href = "./login.html"
+    });
+    return false
 }
-function logout(){
+
+function logout() {
     axios({
         method: 'post',
         url: 'http://localhost:5000/logout',

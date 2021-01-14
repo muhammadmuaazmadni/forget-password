@@ -6,7 +6,7 @@ var morgan = require("morgan");
 var path = require("path")
 var jwt = require('jsonwebtoken')
 
-var {userModel} = require('./dbconn/modules');
+var { userModel } = require('./dbconn/modules');
 var authRoutes = require('./routes/auth')
 
 var SERVER_SECRET = process.env.SECRET || "1234";
@@ -25,16 +25,15 @@ app.use(morgan('dev'));
 
 app.use("/", express.static(path.resolve(path.join(__dirname, "public"))))
 
-app.use('/',authRoutes);
+app.use('/', authRoutes);
 
-app.use(function (req, res, next) {
-
+app.use(function(req, res, next) {
     console.log("req.cookies: ", req.cookies);
     if (!req.cookies.jToken) {
         res.status(401).send("include http-only credentials with every request")
         return;
     }
-    jwt.verify(req.cookies.jToken, SERVER_SECRET, function (err, decodedData) {
+    jwt.verify(req.cookies.jToken, SERVER_SECRET, function(err, decodedData) {
         if (!err) {
 
             const issueDate = decodedData.iat * 1000;
@@ -50,7 +49,7 @@ app.use(function (req, res, next) {
                     email: decodedData.email,
                 }, SERVER_SECRET)
                 res.cookie('jToken', token, {
-                    maxAge: 86_400_000,
+                    maxAge: 86400000,
                     httpOnly: true
                 });
                 req.body.jToken = decodedData
@@ -67,9 +66,10 @@ app.get("/profile", (req, res, next) => {
     console.log(req.body)
 
     userModel.findById(req.body.jToken.id, 'name email phone gender createdOn',
-        function (err, doc) {
+        function(err, doc) {
             if (!err) {
                 res.send({
+                    status: 200,
                     profile: doc
                 })
 

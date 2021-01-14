@@ -145,30 +145,30 @@ router.post('/forget-password', (req, res, next) => {
             message: "please pprovide email"
         })
     }
-    userModel.findOne({email: req.body.email},(err,user)=>{
-        if(err){
+    userModel.findOne({ email: req.body.email }, (err, user) => {
+        if (err) {
             res.status(500).send({
-                message : "Something went wrong"
+                message: "Something went wrong"
             })
         }
-        else if(user){
-            const otp = Math.floor(generetOtp(111111,999999))
+        else if (user) {
+            const otp = Math.floor(generetOtp(111111, 999999))
             otpModel.create({
                 email: req.body.email,
-                otpCode: otp 
-            }).then((data)=>{
+                otp: otp
+            }).then((data) => {
                 client.sendEmail({
                     "From": "jahanzaib_student@sysborg.com",
                     "To": req.body.email,
                     "Subject": "Reset Your Password",
                     "Textbody": `Here is your Reset password code : ${otp}`
-                },(err,status)=>{
-                    if(status){
+                }, (err, status) => {
+                    if (status) {
                         res.send({
                             message: "Email send successfully"
                         })
                     }
-                    else{
+                    else {
                         res.send({
                             message: "An unexpected error occured"
                         })
@@ -176,7 +176,7 @@ router.post('/forget-password', (req, res, next) => {
                 })
             })
         }
-        else{
+        else {
             res.send({
                 message: "User not found"
             })
@@ -185,8 +185,59 @@ router.post('/forget-password', (req, res, next) => {
 
 })
 
-router.post('/forget-password-2', (req,res,nexr)={
-    
+router.post('/forget-password-2', (req, res, next) => {
+    if (!req.body.email && !req.body.newPassword && !req.body.otp) {
+        res.status(403).send({
+            message: "please pprovide email"
+        })
+    }
+
+    userModel.findOne({ email: req.body.email }, (err,user) => {
+        if (err) {
+            res.status(500).send({
+                message: "Something went wrong"
+            })
+        }
+        else if (user) {
+            otpModel.find({ email: req.body.email }, (err, otpData) => {
+                if (err) {
+                    res.status(500).send({
+                        message: "Something went wrong"
+                    })
+                }
+                else if (otpData) {
+                    console.log(otpData)
+                    otpData = otpData[otpData.length - 1]
+                    const nowDate = new Date().getTime();
+                    const otpIat = new Date(otpData.createdOn).getTime();
+                    const diff = nowDate - otpIat;
+                    if (otpData.otp == req.body.otp && diff < 300000) {
+                        otpData.remove();
+                        bcrypt.stringToHash(req.body.newPassword).then(function (hash) {
+                            user.update({ password: hash }, {}, function (err, data) {
+                                res.send("password updated");
+                            })
+                        })
+                    }
+                    else{
+                        res.status(401).send({
+                            message: "incorrect otp"
+                        });
+                    }
+                }
+                else {
+                    res.status(401).send({
+                        message: "incorrect otp"
+                    });
+                }
+            })
+        }
+        else {
+            res.status(401).send({
+                message: "User Not Found"
+            })
+        }
+    })
 })
 
 function generetOtp(min, max) {

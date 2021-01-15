@@ -59,6 +59,45 @@ function getProfile() {
     return false
 }
 
+function forgetPassword() {
+    let email = document.getElementById('fEmail').value;
+    localStorage.setItem('email', email)
+    axios({
+        method: 'post',
+        url: 'http://localhost:5000/forget-password',
+        data: {
+            email: email,
+        },
+        withCredentials: true
+    }).then((response) => {
+        console.log(response);
+        alert(response.data.message)
+        // location.href = "./forget2.html"
+    }, (error) => {
+        console.log(error);
+    });
+    return false
+}
+function forgetPassword2() {
+    let getEmail = localStorage.getItem('email')
+    axios({
+        method: 'post',
+        url: 'http://localhost:5000/forget-password-2',
+        data: {
+            email: getEmail,
+            newPassword: document.getElementById('newPassword').value,
+            otp: document.getElementById('otp').value,
+        },
+        withCredentials: true
+    }).then((response) => {
+        console.log(response);
+        alert(response.data)
+        // location.href = "./forget2.html"
+    }, (error) => {
+        console.log(error);
+    });
+    return false
+}
 function logout() {
     axios({
         method: 'post',

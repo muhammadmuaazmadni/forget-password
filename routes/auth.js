@@ -108,6 +108,7 @@ router.post("/login", (req, res, next) => {
                         });
 
                         res.send({
+                            status: 200,
                             message: "login success",
                             user: {
                                 name: user.name,
@@ -119,8 +120,8 @@ router.post("/login", (req, res, next) => {
 
                     } else {
                         console.log("not matched");
-                        res.status(401).send({
-                            message: "incorrect password"
+                        res.send({
+                            message: "Incorrect password or email"
                         })
                     }
                 }).catch(e => {
@@ -128,7 +129,7 @@ router.post("/login", (req, res, next) => {
                 })
 
             } else {
-                res.status(403).send({
+                res.send({
                     message: "user not found"
                 });
             }
@@ -165,6 +166,7 @@ router.post('/forget-password', (req, res, next) => {
                 }, (err, status) => {
                     if (status) {
                         res.send({
+                            status: 200,
                             message: "Email send successfully"
                         })
                     }

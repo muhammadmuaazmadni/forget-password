@@ -33,9 +33,13 @@ function login() {
         },
         withCredentials: true
     }).then((response) => {
-        console.log(response);
-        alert(response.data.message)
-        location.href = "./profile.html"
+        if(response.data.status === 200){
+            alert(response.data.message)
+            location.href = "./profile.html"
+        }
+        else{
+            alert(response.data.message)
+        }
     }, (error) => {
         console.log(error);
     });
@@ -58,7 +62,6 @@ function getProfile() {
     });
     return false
 }
-
 function forgetPassword() {
     let email = document.getElementById('fEmail').value;
     localStorage.setItem('email', email)
@@ -70,9 +73,13 @@ function forgetPassword() {
         },
         withCredentials: true
     }).then((response) => {
-        console.log(response);
-        alert(response.data.message)
-        // location.href = "./forget2.html"
+        if(response.data.status === 200){
+            alert(response.data.message)
+            location.href = "./forget2.html"      
+        }
+        else{
+            alert(response.data.message)
+        }
     }, (error) => {
         console.log(error);
     });
@@ -92,7 +99,7 @@ function forgetPassword2() {
     }).then((response) => {
         console.log(response);
         alert(response.data)
-        // location.href = "./forget2.html"
+        location.href = "./login.html"
     }, (error) => {
         console.log(error);
     });
